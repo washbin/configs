@@ -1,0 +1,13 @@
+show=drun
+prompt=
+allow_images=true
+term=alacritty
+hide_scroll=true
+location=top
+no_actions=true
+lines=5
+columns=1
+sort_order=alphabetical
+gtk_dark=true
+image_size=32
+key_expand=Tab

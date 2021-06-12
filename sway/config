@@ -1,0 +1,218 @@
+# sway configuration file
+
+# Variables
+set {
+    $mod Mod4
+    $left h
+    $down j
+    $up k
+    $right l
+    $term alacritty
+    $menu wofi | xargs swaymsg exec --
+
+    $wallpaper /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png
+
+    $sway_logout swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway?' -b 'Yes, exit sway' 'swaymsg exit'
+    $wl_logout wlogout --protocol layer-shell
+
+    $screenshot grim $HOME/Pictures/scrn_$(date +"%Y_%m_%d_%I_%M_%p").png
+    $areashot grim -g "$(slurp)" $HOME/Pictures/scrn_$(date +"%Y_%m_%d_%I_%M_%p").png
+
+    $gnome-schema org.gnome.desktop.interface
+}
+
+# Font setting
+font pango:Cascadia 11
+
+### Output configuration
+# wallpaper
+output * bg $wallpaper fill
+
+### Idle configuration
+exec swayidle -w \
+    timeout 300 'swaylock -f -c 000000' \
+    timeout 600 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"' \
+    before-sleep 'swaylock -f -c 000000'
+
+### Input configuration
+input "type:touchpad" {
+    dwt enabled
+    tap enabled
+    natural_scroll enabled
+    middle_emulation enabled
+}
+
+input "type:keyboard" {
+    xkb_layout us
+    xkb_options caps:escape
+}
+
+### Key bindings
+# Basics
+bindsym {
+    $mod+Return exec $term
+    $mod+Shift+q kill
+    $mod+d exec $menu
+}
+floating_modifier $mod normal
+
+# Reload the configuration file
+bindsym $mod+Shift+c reload
+
+# Exit sway
+bindsym {
+    $mod+Shift+e exec $sway_logout
+    $mod+0 exec $wl_logout
+}
+    
+# Focus/Movement
+bindsym {
+    $mod+$left focus left
+    $mod+$down focus down
+    $mod+$up focus up
+    $mod+$right focus right
+
+    $mod+Left focus left
+    $mod+Down focus down
+    $mod+Up focus up
+    $mod+Right focus right
+
+    $mod+a focus parent
+
+    $mod+Shift+$left move left
+    $mod+Shift+$down move down
+    $mod+Shift+$up move up
+    $mod+Shift+$right move right
+
+    $mod+Shift+Left move left
+    $mod+Shift+Down move down
+    $mod+Shift+Up move up
+    $mod+Shift+Right move right
+}
+
+# Workspaces
+bindsym {
+    $mod+1 workspace number 1
+    $mod+2 workspace number 2
+    $mod+3 workspace number 3
+    $mod+4 workspace number 4
+    $mod+5 workspace number 5
+    $mod+6 workspace number 6
+    $mod+7 workspace number 7
+    $mod+8 workspace number 8
+    $mod+9 workspace number 9
+
+    $mod+Shift+1 move container to workspace number 1
+    $mod+Shift+2 move container to workspace number 2
+    $mod+Shift+3 move container to workspace number 3
+    $mod+Shift+4 move container to workspace number 4
+    $mod+Shift+5 move container to workspace number 5
+    $mod+Shift+6 move container to workspace number 6
+    $mod+Shift+7 move container to workspace number 7
+    $mod+Shift+8 move container to workspace number 8
+    $mod+Shift+9 move container to workspace number 9
+}
+
+# Layout
+bindsym {
+    $mod+b splith
+    $mod+v splitv
+
+    $mod+s layout stacking
+    $mod+w layout tabbed
+    $mod+e layout toggle split
+
+    $mod+f fullscreen
+    $mod+Shift+space floating toggle
+    $mod+space focus mode_toggle
+}
+
+# Scratchpad
+bindsym {
+    $mod+Shift+minus move scratchpad
+    $mod+minus scratchpad show
+}
+
+# Resize windows
+mode "resize" {
+    bindsym {
+        $left resize shrink width 10px
+        $down resize grow height 10px
+        $up resize shrink height 10px
+        $right resize grow width 10px
+
+        Left resize shrink width 10px
+        Down resize grow height 10px
+        Up resize shrink height 10px
+        Right resize grow width 10px
+
+        Return mode "default"
+        Escape mode "default"
+    }
+}
+bindsym $mod+r mode "resize"
+
+# Volume keys
+bindsym {
+    XF86AudioRaiseVolume exec amixer -c 0 sset Master 1+ unmute
+    XF86AudioLowerVolume exec amixer -c 0 sset Master 1- unmute
+    XF86AudioMute exec amixer -q set Master toggle
+}
+
+# Brightness keys
+bindsym {
+    XF86MonBrightnessDown exec brightnessctl s 5%-
+    XF86MonBrightnessUp exec brightnessctl s +5%
+}
+
+# Screenshot
+bindsym {
+    Print exec $screenshot && notify-send "SCREEN_SHOT"
+    Shift+Print exec $areashot && notify-send "AREA_CAPTURED"
+}
+
+# Bar
+bar {
+    swaybar_command waybar
+}
+
+# Gaps and borders
+default_border pixel 4
+gaps {
+    inner 8
+    outer 0
+}
+
+# Gtk theme settings
+exec_always {
+    gsettings set $gnome-schema {
+        gtk-theme 'Arc-Dark'
+        icon-theme 'Papirus-Dark'
+        font-name 'Cascadia 10'
+        monospace-font-name 'Source Code Pro 10'
+    }
+}
+
+# Window Rules
+assign {
+    [app_id="firefox"] 2
+    [app_id="Chromium-browser"] 2
+    [app_id="qutebrowser"] 2
+    [app_id="zathura"] 4
+    [app_id="libreoffice"] 4
+    [app_id="mpv"] 5
+}
+
+# Autostart
+exec {
+    mako
+    mpd
+}
+
+# Opacity
+# for_window [app_id=".*"] opacity 0.95
+
+# XWayland setting
+xwayland disable
+
+include /etc/sway/config.d/*
